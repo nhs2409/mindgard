@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINDGARD - The AI Guardian for Your Focus</title>
+    <meta name="description"
+        content="MINDGARD - Browser Extension tích hợp AI Coach giúp quản lý sự tập trung. Không chỉ chặn, mà là huấn luyện bộ não của bạn.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0F172A',
+                            900: '#020617', // Deep Navy
+                            950: '#010409',
+                        },
+                        emerald: {
+                            400: '#34D399',
+                            500: '#10B981', // Focus Green
+                            600: '#059669',
+                        },
+                        neon: {
+                            cyan: '#06B6D4',
+                            purple: '#8B5CF6',
+                            pink: '#EC4899'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-slow': {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.7' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Styles & Advanced Effects */
+        :root {
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --neon-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        body {
+            background-color: #020617;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        /* Noise Overlay for Texture */
+        .noise-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Premium Glassmorphism */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(52, 211, 153, 0.4);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 50px -10px rgba(52, 211, 153, 0.15);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 30px rgba(52, 211, 153, 0.5);
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Animated Blobs Background */
+        .blob-cont {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: blob 15s infinite alternate;
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(to right, #34D399, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Grid Background Pattern */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-emerald-500 selection:text-white relative">
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-bg"></div>
+
+    <!-- Animated Background Blobs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/40 rounded-full mix-blend-screen filter blur-3xl animate-blob">
+        </div>
+        <div
+            class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/40 rounded-full mix-blend-screen filter blur-3xl animate-blob animation-delay-2000">
+        </div>
+        <div
+            class="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-blue-900/40 rounded-full mix-blend-screen filter blur-3xl animate-blob animation-delay-4000">
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed w-full top-0 z-50 transition-all duration-300 glass border-b-0" id="navbar">
+        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 group cursor-pointer">
+                <div class="relative">
+                    <div
+                        class="absolute inset-0 bg-emerald-500 blur opacity-20 group-hover:opacity-40 transition-opacity">
+                    </div>
+                    <i data-lucide="brain-circuit"
+                        class="text-emerald-400 h-8 w-8 relative z-10 transition-transform group-hover:rotate-12"></i>
+                </div>
+                <span
+                    class="font-display font-bold text-2xl tracking-tight text-white group-hover:text-emerald-300 transition-colors">MINDGARD</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#features"
+                    class="text-slate-400 hover:text-emerald-400 hover:scale-105 transition-all text-sm font-medium">Tính
+                    năng</a>
+                <a href="#problem"
+                    class="text-slate-400 hover:text-emerald-400 hover:scale-105 transition-all text-sm font-medium">Vấn
+                    đề</a>
+                <a href="#guide"
+                    class="text-slate-400 hover:text-emerald-400 hover:scale-105 transition-all text-sm font-medium">Hướng
+                    dẫn</a>
+                <a href="#pricing"
+                    class="text-slate-400 hover:text-emerald-400 hover:scale-105 transition-all text-sm font-medium">Bảng
+                    giá</a>
+            </nav>
+
+            <button
+                class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] flex items-center gap-2 text-sm hover:-translate-y-0.5">
+                <span>Thêm vào Chrome</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen pt-32 pb-20 flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 grid-bg z-0"></div>
+
+        <div class="container mx-auto px-6 relative z-10 text-center">
+
+            <div data-aos="fade-down" data-aos-duration="1000"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-emerald-500/30 mb-8 hover:border-emerald-500/60 transition-colors cursor-default">
+                <span class="relative flex h-2 w-2">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-emerald-400 text-xs font-semibold uppercase tracking-wider">AI Guardian for Focus
+                    <span class="text-slate-500 px-1">|</span> v2.0 Live</span>
+            </div>
+
+            <h1 data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200"
+                class="font-display font-extrabold text-5xl md:text-8xl leading-none mb-8 max-w-5xl mx-auto tracking-tight">
+                Lấy lại <span class="gradient-text text-glow">2 giờ mỗi ngày</span><br>
+                <span class="text-white text-4xl md:text-7xl">từ sự cám dỗ của TikTok</span>
+            </h1>
+
+            <p data-aos="fade-up" data-aos-delay="400"
+                class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                Không chỉ chặn. MINDGARD tích hợp <strong class="text-emerald-300 font-semibold">AI Coach</strong> giúp
+                bạn huấn luyện bộ não, biến sự mất tập trung thành những Quest thú vị.
+            </p>
+
+            <div data-aos="fade-up" data-aos-delay="600"
+                class="flex flex-col md:flex-row items-center justify-center gap-5">
+                <button
+                    class="w-full md:w-auto bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-[0_0_40px_rgba(16,185,129,0.4)] hover:shadow-[0_0_60px_rgba(16,185,129,0.7)] flex items-center justify-center gap-3 transform hover:-translate-y-1 btn-glow group">
+                    <i data-lucide="chrome" class="w-6 h-6 group-hover:rotate-12 transition-transform"></i>
+                    Thêm vào Chrome - Miễn phí
+                </button>
+                <button
+                    class="w-full md:w-auto px-8 py-4 rounded-2xl font-bold text-slate-200 border border-slate-700 hover:border-emerald-500/50 hover:bg-slate-800/50 hover:text-white transition-all flex items-center justify-center gap-3 backdrop-blur-md">
+                    <i data-lucide="play-circle" class="w-6 h-6"></i>
+                    Xem Demo
+                </button>
+            </div>
+
+            <!-- Fake UI / Abstract Visual -->
+            <div data-aos="zoom-in-up" data-aos-duration="1200" data-aos-delay="800"
+                class="mt-20 mx-auto max-w-5xl glass border border-slate-700/50 rounded-3xl p-1 animate-float shadow-2xl relative">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200">
+                </div>
+                <div
+                    class="relative rounded-[22px] bg-black/80 p-8 aspect-[16/9] md:aspect-[21/9] flex items-center justify-center overflow-hidden">
+
+                    <!-- Decorative Circles in UI -->
+                    <div
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[100px]">
+                    </div>
+
+                    <div class="relative z-10 text-center">
+                        <div
+                            class="w-24 h-24 bg-gradient-to-br from-gray-800 to-black rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                            <i data-lucide="shield-alert" class="w-10 h-10 text-emerald-400 animate-pulse"></i>
+                        </div>
+                        <h3 class="text-3xl font-display font-bold mb-3 text-white">MINDGARD đang bảo vệ bạn</h3>
+                        <p class="text-slate-400 text-lg">"Có vẻ như bạn đang định lướt TikTok trong giờ học?"</p>
+
+                        <div class="mt-8 flex gap-4 justify-center">
+                            <button
+                                class="px-6 py-3 rounded-xl bg-slate-800/80 text-slate-400 text-sm border border-slate-700 hover:bg-slate-800 hover:text-white transition-colors">
+                                Chỉ 5 phút thôi
+                            </button>
+                            <button
+                                class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-900/50 transition-all transform hover:scale-105">
+                                Quay lại học ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Problem Section -->
+    <section id="problem" class="py-32 relative">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-20 items-center">
+
+                <!-- Stat Card -->
+                <div data-aos="fade-right"
+                    class="glass-card p-12 rounded-[40px] relative overflow-hidden group border border-white/5">
+                    <div
+                        class="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity duration-700">
+                        <i data-lucide="alert-triangle" class="w-48 h-48 rotate-12"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div
+                            class="text-8xl font-display font-bold text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                            60%</div>
+                        <h3 class="text-3xl font-bold text-white mb-6">Sinh viên mất tập trung <br>chỉ sau <span
+                                class="text-red-400">30 phút</span></h3>
+                        <p class="text-slate-400 leading-loose text-lg">
+                            Mạng xã hội, thông báo, và 'doom-scrolling' đang bào mòn khả năng focus sâu của bạn. Bạn
+                            không lười, chỉ là bộ não của bạn đang bị đánh cắp dopamine.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Text Content -->
+                <div data-aos="fade-left">
+                    <h2 class="font-display font-bold text-5xl mb-12 leading-tight">Tại sao các blocker cũ đều <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-500 decoration-2">Thất
+                            bại</span>?</h2>
+                    <ul class="space-y-8">
+                        <li class="flex items-start gap-6 group">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-red-500/10 group-hover:border-red-500/30 transition-all">
+                                <i data-lucide="x"
+                                    class="text-slate-400 group-hover:text-red-400 w-6 h-6 transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xl text-white mb-2">Quá cứng nhắc</h4>
+                                <p class="text-slate-400">Chặn hoàn toàn khiến bạn ức chế và gỡ bỏ app ngay lập tức chỉ
+                                    sau 1 ngày sử dụng.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-6 group">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-red-500/10 group-hover:border-red-500/30 transition-all">
+                                <i data-lucide="x"
+                                    class="text-slate-400 group-hover:text-red-400 w-6 h-6 transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xl text-white mb-2">Thiếu thấu hiểu ngữ cảnh</h4>
+                                <p class="text-slate-400">Không phân biệt được bạn đang xem YouTube để học tài liệu hay
+                                    là đang giải trí vô bổ.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The 3 Pillars (Features) -->
+    <section id="features" class="py-32 relative">
+        <!-- Radial Gradient Background -->
+        <div
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/20 via-navy-950/50 to-navy-950 opacity-40 z-0">
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-20" data-aos="fade-up">
+                <span class="text-emerald-400 font-bold tracking-widest text-sm uppercase mb-3 block">Technology
+                    Pillars</span>
+                <h2 class="font-display font-bold text-5xl mb-6">Giải pháp <span class="gradient-text">Thế hệ mới</span>
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">Kết hợp Khoa học thần kinh và AI để xây dựng thói
+                    quen bền vững.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+
+                <!-- Pillar 1 -->
+                <div data-aos="fade-up" data-aos-delay="0"
+                    class="glass-card p-10 rounded-[30px] flex flex-col h-full group hover:shadow-[0_0_40px_rgba(16,185,129,0.1)]">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="scan-eye" class="text-emerald-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors">AI
+                        Content Classification</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8 flex-1">
+                        AI tự động phân tích nội dung thực tế (Video transcription, Page content). Nó biết rõ bạn đang
+                        xem video "Lecture 01 - Data Science" hay "Mèo múa lửa".
+                    </p>
+                    <div class="mt-auto pt-6 border-t border-white/5 flex justify-between items-center">
+                        <span
+                            class="text-xs font-mono text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">Smart
+                            Detection v2.0</span>
+                    </div>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div data-aos="fade-up" data-aos-delay="150"
+                    class="glass-card p-10 rounded-[30px] flex flex-col h-full group ring-1 ring-emerald-500/20">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="message-square-heart" class="text-cyan-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-cyan-300 transition-colors">
+                        Conversational AI Coach</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8 flex-1">
+                        Không phải cảnh sát, đây là người bạn đồng hành. Thay vì thông báo "BỊ CHẶN!", AI sẽ hỏi: "Cậu
+                        mệt rồi à? Hay nghỉ 5 phút nhé?" giúp giảm căng thẳng.
+                    </p>
+                    <div class="mt-auto pt-6 border-t border-white/5 flex justify-between items-center">
+                        <span
+                            class="text-xs font-mono text-cyan-500 bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/20">NLP
+                            Assisted</span>
+                    </div>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div data-aos="fade-up" data-aos-delay="300"
+                    class="glass-card p-10 rounded-[30px] flex flex-col h-full group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="gamepad-2" class="text-purple-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-purple-300 transition-colors">
+                        Gamified Focus Training</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8 flex-1">
+                        Biến giờ học thành Quest RPG. Hoàn thành 45' tập trung để nhận XP, thăng cấp và mở khóa các
+                        mini-games luyện não độc quyền chỉ có trên MINDGARD.
+                    </p>
+                    <div class="mt-auto pt-6 border-t border-white/5 flex justify-between items-center">
+                        <span
+                            class="text-xs font-mono text-purple-500 bg-purple-500/10 px-3 py-1.5 rounded-full border border-purple-500/20">Level
+                            Up System</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section id="guide" class="py-32 relative overflow-hidden">
+        <!-- Background Effects -->
+        <div
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-navy-950/50 to-navy-950 opacity-40 z-0">
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-20" data-aos="fade-up">
+                <span class="text-cyan-400 font-bold tracking-widest text-sm uppercase mb-3 block">User Guide</span>
+                <h2 class="font-display font-bold text-5xl mb-6">
+                    Hướng dẫn <span class="gradient-text">Sử dụng</span>
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+                    Chỉ mất 2 phút để bắt đầu hành trình lấy lại sự tập trung của bạn.
+                </p>
+            </div>
+
+            <!-- Installation Steps -->
+            <div class="mb-24">
+                <h3 class="text-3xl font-bold text-white mb-12 text-center" data-aos="fade-up">
+                    <i data-lucide="download" class="inline-block w-8 h-8 text-emerald-400 mr-3"></i>
+                    Cài đặt Extension
+                </h3>
+
+                <div class="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                    <!-- Step 1 -->
+                    <div data-aos="fade-up" data-aos-delay="0"
+                        class="glass-card p-8 rounded-[24px] text-center relative group">
+                        <div
+                            class="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg">
+                            1
+                        </div>
+                        <div class="mt-6 mb-6">
+                            <div
+                                class="w-16 h-16 mx-auto bg-emerald-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="chrome" class="w-8 h-8 text-emerald-400"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white mb-3">Mở Chrome Store</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Truy cập Chrome Web Store và tìm kiếm "MINDGARD"
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div data-aos="fade-up" data-aos-delay="100"
+                        class="glass-card p-8 rounded-[24px] text-center relative group">
+                        <div
+                            class="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg">
+                            2
+                        </div>
+                        <div class="mt-6 mb-6">
+                            <div
+                                class="w-16 h-16 mx-auto bg-cyan-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="mouse-pointer-click" class="w-8 h-8 text-cyan-400"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white mb-3">Thêm Extension</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Click "Thêm vào Chrome" và xác nhận cài đặt
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div data-aos="fade-up" data-aos-delay="200"
+                        class="glass-card p-8 rounded-[24px] text-center relative group">
+                        <div
+                            class="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg">
+                            3
+                        </div>
+                        <div class="mt-6 mb-6">
+                            <div
+                                class="w-16 h-16 mx-auto bg-purple-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="settings" class="w-8 h-8 text-purple-400"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white mb-3">Cấu hình</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Thiết lập mục tiêu và danh sách website cần theo dõi
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div data-aos="fade-up" data-aos-delay="300"
+                        class="glass-card p-8 rounded-[24px] text-center relative group">
+                        <div
+                            class="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg">
+                            4
+                        </div>
+                        <div class="mt-6 mb-6">
+                            <div
+                                class="w-16 h-16 mx-auto bg-emerald-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="rocket" class="w-8 h-8 text-emerald-400"></i>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-white mb-3">Bắt đầu!</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Tận hưởng trải nghiệm tập trung tối ưu
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Walkthrough -->
+            <div class="mb-24">
+                <h3 class="text-3xl font-bold text-white mb-12 text-center" data-aos="fade-up">
+                    <i data-lucide="book-open" class="inline-block w-8 h-8 text-cyan-400 mr-3"></i>
+                    Cách thức hoạt động
+                </h3>
+
+                <!-- Image Carousel Section -->
+                <div class="max-w-5xl mx-auto mb-16" data-aos="fade-up">
+                    <div class="glass-card rounded-[30px] p-8 relative overflow-hidden">
+                        <!-- Carousel Container -->
+                        <div class="relative">
+                            <!-- Slides Wrapper -->
+                            <div class="carousel-wrapper overflow-hidden rounded-2xl">
+                                <div class="carousel-track flex transition-transform duration-500 ease-in-out">
+
+                                    <!-- Slide 1: AI Detection -->
+                                    <div class="carousel-slide min-w-full">
+                                        <div
+                                            class="aspect-video bg-gradient-to-br from-emerald-900/40 to-emerald-500/20 rounded-xl flex items-center justify-center relative overflow-hidden group">
+                                            <!-- Replace background-gradient with: style="background-image: url('path/to/your/image1.jpg'); background-size: cover; background-position: center;" -->
+                                            <div class="absolute inset-0 bg-black/40"></div>
+                                            <div class="relative z-10 text-center p-8">
+                                                <div
+                                                    class="w-20 h-20 mx-auto mb-6 bg-emerald-500/20 rounded-2xl flex items-center justify-center">
+                                                    <i data-lucide="scan-eye" class="w-10 h-10 text-emerald-400"></i>
+                                                </div>
+                                                <h4 class="text-3xl font-bold text-white mb-4">AI Phát hiện Thông minh
+                                                </h4>
+                                                <p class="text-slate-300 max-w-2xl mx-auto">Nhận diện nội dung video và
+                                                    website tự động</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 2: AI Coach -->
+                                    <div class="carousel-slide min-w-full">
+                                        <div
+                                            class="aspect-video bg-gradient-to-br from-cyan-900/40 to-cyan-500/20 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            <!-- Replace with: style="background-image: url('path/to/your/image2.jpg'); background-size: cover; background-position: center;" -->
+                                            <div class="absolute inset-0 bg-black/40"></div>
+                                            <div class="relative z-10 text-center p-8">
+                                                <div
+                                                    class="w-20 h-20 mx-auto mb-6 bg-cyan-500/20 rounded-2xl flex items-center justify-center">
+                                                    <i data-lucide="message-circle-heart"
+                                                        class="w-10 h-10 text-cyan-400"></i>
+                                                </div>
+                                                <h4 class="text-3xl font-bold text-white mb-4">AI Coach Đồng hành</h4>
+                                                <p class="text-slate-300 max-w-2xl mx-auto">Trò chuyện thân thiện thay
+                                                    vì chặn cứng nhắc</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 3: Gamification -->
+                                    <div class="carousel-slide min-w-full">
+                                        <div
+                                            class="aspect-video bg-gradient-to-br from-purple-900/40 to-purple-500/20 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            <!-- Replace with: style="background-image: url('path/to/your/image3.jpg'); background-size: cover; background-position: center;" -->
+                                            <div class="absolute inset-0 bg-black/40"></div>
+                                            <div class="relative z-10 text-center p-8">
+                                                <div
+                                                    class="w-20 h-20 mx-auto mb-6 bg-purple-500/20 rounded-2xl flex items-center justify-center">
+                                                    <i data-lucide="gamepad-2" class="w-10 h-10 text-purple-400"></i>
+                                                </div>
+                                                <h4 class="text-3xl font-bold text-white mb-4">Gamification & Rewards
+                                                </h4>
+                                                <p class="text-slate-300 max-w-2xl mx-auto">Nhận XP, Level Up và mở khóa
+                                                    Mini-games</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 4: Analytics -->
+                                    <div class="carousel-slide min-w-full">
+                                        <div
+                                            class="aspect-video bg-gradient-to-br from-pink-900/40 to-pink-500/20 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            <!-- Replace with: style="background-image: url('path/to/your/image4.jpg'); background-size: cover; background-position: center;" -->
+                                            <div class="absolute inset-0 bg-black/40"></div>
+                                            <div class="relative z-10 text-center p-8">
+                                                <div
+                                                    class="w-20 h-20 mx-auto mb-6 bg-pink-500/20 rounded-2xl flex items-center justify-center">
+                                                    <i data-lucide="bar-chart-3" class="w-10 h-10 text-pink-400"></i>
+                                                </div>
+                                                <h4 class="text-3xl font-bold text-white mb-4">Thống kê Chi tiết</h4>
+                                                <p class="text-slate-300 max-w-2xl mx-auto">Theo dõi tiến độ và thời
+                                                    gian tập trung</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <button id="prevBtn"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-all group z-20 border border-white/20">
+                                <i data-lucide="chevron-left"
+                                    class="w-6 h-6 text-white group-hover:scale-110 transition-transform"></i>
+                            </button>
+                            <button id="nextBtn"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-all group z-20 border border-white/20">
+                                <i data-lucide="chevron-right"
+                                    class="w-6 h-6 text-white group-hover:scale-110 transition-transform"></i>
+                            </button>
+
+                            <!-- Indicators -->
+                            <div class="flex justify-center gap-2 mt-6">
+                                <button class="carousel-indicator w-12 h-1.5 bg-emerald-500 rounded-full transition-all"
+                                    data-index="0"></button>
+                                <button
+                                    class="carousel-indicator w-12 h-1.5 bg-white/20 rounded-full transition-all hover:bg-white/40"
+                                    data-index="1"></button>
+                                <button
+                                    class="carousel-indicator w-12 h-1.5 bg-white/20 rounded-full transition-all hover:bg-white/40"
+                                    data-index="2"></button>
+                                <button
+                                    class="carousel-indicator w-12 h-1.5 bg-white/20 rounded-full transition-all hover:bg-white/40"
+                                    data-index="3"></button>
+                            </div>
+                        </div>
+
+                        <!-- Instructions for User -->
+                        <div class="mt-8 glass p-6 rounded-2xl border border-emerald-500/20">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                    <i data-lucide="info" class="w-5 h-5 text-emerald-400"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-white mb-2">📸 Cách thay ảnh của bạn:</h5>
+                                    <p class="text-slate-400 text-sm leading-relaxed mb-3">
+                                        Để thay thế bằng ảnh của bạn, tìm các dòng có comment "Replace with" trong code
+                                        và thêm:
+                                    </p>
+                                    <code class="block bg-black/50 p-3 rounded-lg text-xs text-emerald-300 font-mono">
+                                        style="background-image: url('duong-dan-anh-cua-ban.jpg'); background-size: cover; background-position: center;"
+                                    </code>
+                                    <p class="text-slate-500 text-xs mt-3">
+                                        💡 Tip: Upload ảnh vào thư mục dự án và sử dụng đường dẫn tương đối như: <span
+                                            class="text-cyan-400">'./images/screenshot1.jpg'</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <!-- Feature 1: AI Detection -->
+                    <div data-aos="fade-right"
+                        class="glass-card p-10 rounded-[30px] group hover:border-emerald-500/30 transition-all">
+                        <div class="flex items-start gap-6">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                                <i data-lucide="scan" class="text-emerald-400 w-7 h-7"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-bold text-white mb-3 group-hover:text-emerald-300 transition-colors">
+                                    AI Phát hiện Tự động
+                                </h4>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                    Khi bạn truy cập vào website giải trí (TikTok, YouTube, Facebook), AI sẽ tự động
+                                    phân tích nội dung đang xem.
+                                </p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2 text-xs">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                        <span class="text-slate-500">Video học tập → <span class="text-emerald-400">Cho
+                                                phép xem</span></span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-xs">
+                                        <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                        <span class="text-slate-500">Video giải trí → <span class="text-red-400">Hiện
+                                                popup nhắc nhở</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: AI Coach -->
+                    <div data-aos="fade-left"
+                        class="glass-card p-10 rounded-[30px] group hover:border-cyan-500/30 transition-all">
+                        <div class="flex items-start gap-6">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/20 flex items-center justify-center shrink-0">
+                                <i data-lucide="message-circle-heart" class="text-cyan-400 w-7 h-7"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                                    Trò chuyện với AI Coach
+                                </h4>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                    Thay vì chặn cứng, AI sẽ hỏi thăm và khuyến khích bạn quay lại nhiệm vụ một cách nhẹ
+                                    nhàng.
+                                </p>
+                                <div class="glass p-3 rounded-xl border border-cyan-500/20 text-xs">
+                                    <div class="flex items-start gap-2 mb-2">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0">
+                                            <i data-lucide="bot" class="w-3 h-3 text-cyan-400"></i>
+                                        </div>
+                                        <p class="text-slate-300 italic">"Hey, có vẻ bạn đang mệt rồi. Nghỉ 5 phút hoặc
+                                            quay lại học nhé?"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: Pomodoro -->
+                    <div data-aos="fade-right"
+                        class="glass-card p-10 rounded-[30px] group hover:border-purple-500/30 transition-all">
+                        <div class="flex items-start gap-6">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 flex items-center justify-center shrink-0">
+                                <i data-lucide="timer" class="text-purple-400 w-7 h-7"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-bold text-white mb-3 group-hover:text-purple-300 transition-colors">
+                                    Pomodoro Timer Gamified
+                                </h4>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                    Sử dụng kỹ thuật Pomodoro 25/5 phút, mỗi phiên hoàn thành được tích XP và lên cấp.
+                                </p>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div class="h-full w-[70%] bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                                    </div>
+                                    <span class="text-xs font-mono text-purple-400">+150 XP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4: Analytics -->
+                    <div data-aos="fade-left"
+                        class="glass-card p-10 rounded-[30px] group hover:border-pink-500/30 transition-all">
+                        <div class="flex items-start gap-6">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-pink-500/5 border border-pink-500/20 flex items-center justify-center shrink-0">
+                                <i data-lucide="bar-chart-3" class="text-pink-400 w-7 h-7"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4
+                                    class="text-xl font-bold text-white mb-3 group-hover:text-pink-300 transition-colors">
+                                    Theo dõi Thống kê
+                                </h4>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                    Xem biểu đồ tập trung hàng ngày/tuần/tháng, biết chính xác bạn tiết kiệm được bao
+                                    nhiêu thời gian.
+                                </p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="glass p-2 rounded-lg text-center border border-white/5">
+                                        <div class="text-emerald-400 font-bold text-lg">2.5h</div>
+                                        <div class="text-slate-500 text-xs">Hôm nay</div>
+                                    </div>
+                                    <div class="glass p-2 rounded-lg text-center border border-white/5">
+                                        <div class="text-cyan-400 font-bold text-lg">18h</div>
+                                        <div class="text-slate-500 text-xs">Tuần này</div>
+                                    </div>
+                                    <div class="glass p-2 rounded-lg text-center border border-white/5">
+                                        <div class="text-purple-400 font-bold text-lg">72h</div>
+                                        <div class="text-slate-500 text-xs">Tháng này</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Tips -->
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-white mb-12 text-center" data-aos="fade-up">
+                    <i data-lucide="lightbulb" class="inline-block w-8 h-8 text-yellow-400 mr-3"></i>
+                    Tips & Tricks
+                </h3>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Tip 1 -->
+                    <div data-aos="zoom-in" data-aos-delay="0"
+                        class="glass-card p-8 rounded-[24px] text-center hover:shadow-[0_0_30px_rgba(52,211,153,0.15)] transition-all">
+                        <div
+                            class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20 flex items-center justify-center">
+                            <i data-lucide="target" class="text-emerald-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">Đặt Mục tiêu Rõ ràng</h4>
+                        <p class="text-slate-400 text-sm">
+                            Thiết lập mục tiêu cụ thể mỗi ngày để AI Coach hỗ trợ tốt hơn
+                        </p>
+                    </div>
+
+                    <!-- Tip 2 -->
+                    <div data-aos="zoom-in" data-aos-delay="100"
+                        class="glass-card p-8 rounded-[24px] text-center hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all">
+                        <div
+                            class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-cyan-500/20 flex items-center justify-center">
+                            <i data-lucide="calendar-check" class="text-cyan-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">Duy trì Streak</h4>
+                        <p class="text-slate-400 text-sm">
+                            Tập trung ít nhất 2 giờ/ngày để giữ streak và nhận phần thưởng
+                        </p>
+                    </div>
+
+                    <!-- Tip 3 -->
+                    <div data-aos="zoom-in" data-aos-delay="200"
+                        class="glass-card p-8 rounded-[24px] text-center hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] transition-all">
+                        <div
+                            class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 flex items-center justify-center">
+                            <i data-lucide="trophy" class="text-purple-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">Unlock Mini-games</h4>
+                        <p class="text-slate-400 text-sm">
+                            Hoàn thành quest để mở khóa minigame luyện não độc quyền
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div data-aos="fade-up" class="text-center mt-20">
+                <button
+                    class="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all shadow-[0_0_40px_rgba(16,185,129,0.4)] hover:shadow-[0_0_60px_rgba(16,185,129,0.7)] flex items-center justify-center gap-3 transform hover:-translate-y-1 btn-glow group mx-auto">
+                    <i data-lucide="sparkles" class="w-6 h-6 group-hover:rotate-12 transition-transform"></i>
+                    Bắt đầu ngay - Hoàn toàn Miễn phí
+                    <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <p class="text-slate-500 text-sm mt-4">Không cần thẻ tín dụng • Cài đặt trong 2 phút</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-32 relative bg-navy-950">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h2 class="font-display font-bold text-5xl mb-4 text-white">Đầu tư cho tương lai</h2>
+                <p class="text-slate-400 text-lg">Giá chỉ bằng một cốc trà sữa, nhưng trả lại bạn <span
+                        class="text-emerald-400 font-bold">60+ giờ</span> mỗi tháng.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 max-w-5xl mx-auto gap-10">
+
+                <!-- Free Plan -->
+                <div data-aos="fade-right"
+                    class="glass border border-slate-800 rounded-[32px] p-10 flex flex-col hover:bg-slate-800/20 transition-colors">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-slate-300">Starter</h3>
+                        <div class="text-5xl font-display font-bold text-white mt-4">0đ<span
+                                class="text-xl text-slate-500 font-normal">/tháng</span></div>
+                        <p class="text-slate-500 text-sm mt-4">Dành cho người mới bắt đầu cai nghiện MXH.</p>
+                    </div>
+                    <ul class="space-y-5 mb-10 flex-1">
+                        <li class="flex items-center gap-4 text-slate-300">
+                            <i data-lucide="check" class="w-5 h-5 text-emerald-500"></i> Smart Blocking cơ bản
+                        </li>
+                        <li class="flex items-center gap-4 text-slate-300">
+                            <i data-lucide="check" class="w-5 h-5 text-emerald-500"></i> Pomodoro Timer
+                        </li>
+                        <li class="flex items-center gap-4 text-slate-300">
+                            <i data-lucide="check" class="w-5 h-5 text-emerald-500"></i> Stat ngày đơn giản
+                        </li>
+                    </ul>
+                    <button
+                        class="w-full py-4 rounded-xl border border-slate-700 text-white font-bold hover:bg-slate-800 hover:border-slate-500 transition-all">
+                        Sử dụng Miễn phí
+                    </button>
+                </div>
+
+                <!-- Premium Plan -->
+                <div data-aos="fade-left"
+                    class="glass relative rounded-[32px] p-10 flex flex-col overflow-hidden transform md:-translate-y-6 shadow-2xl border border-emerald-500/30">
+                    <div class="absolute inset-0 bg-emerald-500/5 pointer-events-none"></div>
+                    <div
+                        class="absolute top-0 right-0 bg-emerald-500 text-black text-xs font-extrabold px-4 py-1.5 rounded-bl-2xl">
+                        MOST POPULAR</div>
+
+                    <div class="mb-8 relative z-10">
+                        <h3 class="text-2xl font-bold text-emerald-300">Pro Guardian</h3>
+                        <div class="text-5xl font-display font-bold text-white mt-4">x<span
+                                class="text-xl text-slate-400 font-normal">/tháng</span></div>
+                        <p class="text-emerald-100/60 text-sm mt-4">Full tính năng để tối ưu hóa hiệu suất não bộ.</p>
+                    </div>
+
+                    <ul class="space-y-5 mb-10 flex-1 relative z-10">
+                        <li class="flex items-center gap-4 text-white">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"><i
+                                    data-lucide="check" class="w-4 h-4 text-emerald-400"></i></div>
+                            <strong>AI Chatbot Coach</strong> không giới hạn
+                        </li>
+                        <li class="flex items-center gap-4 text-white">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"><i
+                                    data-lucide="check" class="w-4 h-4 text-emerald-400"></i></div>
+                            Phân loại nội dung nâng cao (YouTube, FB)
+                        </li>
+                        <li class="flex items-center gap-4 text-white">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"><i
+                                    data-lucide="check" class="w-4 h-4 text-emerald-400"></i></div>
+                            Full Mini-games & Quest System
+                        </li>
+                        <li class="flex items-center gap-4 text-white">
+                            <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"><i
+                                    data-lucide="check" class="w-4 h-4 text-emerald-400"></i></div>
+                            In-depth Analytics (Biểu đồ tuần/tháng)
+                        </li>
+                    </ul>
+
+                    <button
+                        class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-navy-900 font-extrabold transition-all shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_8px_30px_rgba(16,185,129,0.4)] relative z-10 hover:-translate-y-1">
+                        Nâng cấp ngay
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-900 bg-black relative z-10">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-3">
+                <i data-lucide="brain-circuit" class="text-slate-600 h-6 w-6"></i>
+                <span class="font-display font-bold text-xl text-slate-500 tracking-tight">MINDGARD</span>
+            </div>
+            <div class="text-slate-600 text-sm">
+                &copy; 2024 MindGard AI. Designed for Focus.
+            </div>
+            <div class="flex gap-8">
+                <a href="#" class="text-slate-600 hover:text-emerald-500 transition-colors transform hover:scale-110"><i
+                        data-lucide="facebook" class="w-5 h-5"></i></a>
+                <a href="#" class="text-slate-600 hover:text-emerald-500 transition-colors transform hover:scale-110"><i
+                        data-lucide="twitter" class="w-5 h-5"></i></a>
+                <a href="#" class="text-slate-600 hover:text-emerald-500 transition-colors transform hover:scale-110"><i
+                        data-lucide="instagram" class="w-5 h-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Init Animations
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800,
+            easing: 'ease-out-cubic',
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('bg-navy-900/80', 'backdrop-blur-xl', 'shadow-2xl', 'border-b', 'border-white/5');
+            } else {
+                navbar.classList.remove('bg-navy-900/80', 'backdrop-blur-xl', 'shadow-2xl', 'border-b', 'border-white/5');
+            }
+        });
+
+        // Carousel Functionality
+        const carouselTrack = document.querySelector('.carousel-track');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicators = document.querySelectorAll('.carousel-indicator');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+
+        function updateCarousel() {
+            // Move the track
+            const offset = -currentIndex * 100;
+            carouselTrack.style.transform = `translateX(${offset}%)`;
+
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.remove('bg-white/20');
+                    indicator.classList.add('bg-emerald-500');
+                } else {
+                    indicator.classList.remove('bg-emerald-500');
+                    indicator.classList.add('bg-white/20');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+
+        // Event Listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Indicator clicks
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                currentIndex = index;
+                updateCarousel();
+            });
+        });
+
+        // Auto-play carousel (optional - every 5 seconds)
+        let autoPlayInterval = setInterval(nextSlide, 5000);
+
+        // Pause auto-play on hover
+        const carouselWrapper = document.querySelector('.carousel-wrapper');
+        carouselWrapper.addEventListener('mouseenter', () => {
+            clearInterval(autoPlayInterval);
+        });
+
+        carouselWrapper.addEventListener('mouseleave', () => {
+            autoPlayInterval = setInterval(nextSlide, 5000);
+        });
+    </script>
+</body>
+
+</html>
